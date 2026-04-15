@@ -1,6 +1,5 @@
 # Darth Faders Puzzle - Build/Install Guide
-The Darth Faders Puzzle Trigger online guide explains in great detail the hardware, software and wiring for this project. We encourage you to read this first to get comfortable and familiar with
-the project and it's components.
+The Darth Faders Puzzle Trigger online guide explains in great detail the hardware, software and wiring for this project. We encourage you to read this first to get comfortable and familiar with the project and it's components.
 
 ## 3D Models
 There are 7 pieces to the project
