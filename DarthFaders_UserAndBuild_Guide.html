@@ -1,0 +1,1589 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Darth Faders Puzzle — Build Guide</title>
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #141416;
+    --surface2: #1a1a1d;
+    --surface3: #222226;
+    --border: #2a2a2e;
+    --text: #e8e6e0;
+    --muted: #8a8884;
+    --faint: #4a4a4e;
+    --red: #e05252;
+    --green: #4caf7d;
+    --yellow: #e8b84b;
+    --blue: #5b9bd5;
+    --orange: #ff7a00;
+    --accent: #5b9bd5;
+    --radius: 8px;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    --font-body: 'Inter', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+  .responsive-img {
+  max-width: 100%;
+  height: auto;
+  display: block; /* Removes bottom spacing in some layouts */
+}
+/* WIRING DIAGRAM */
+.diagram-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  overflow-x: auto;
+}
+.diagram-svg-wrap { min-width: 700px; }
+
+  /* ── Layout ── */
+  .layout {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 260px;
+    min-width: 260px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 24px 0;
+    flex-shrink: 0;
+  }
+
+  .sidebar-logo {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .sidebar-logo svg { display: block; margin-bottom: 8px; }
+
+  .sidebar-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .sidebar-subtitle {
+    font-size: 11px;
+    color: var(--faint);
+    margin-top: 2px;
+  }
+
+  .nav-group-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+    padding: 12px 20px 4px;
+  }
+
+  .nav-link {
+    display: block;
+    padding: 7px 20px;
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+
+  .nav-link:hover {
+    color: var(--text);
+    background: var(--surface2);
+    border-left-color: var(--faint);
+  }
+
+  .nav-link.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: rgba(91,155,213,0.07);
+  }
+
+  /* ── Mobile nav toggle ── */
+  .mobile-nav-toggle {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 200;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    cursor: pointer;
+    color: var(--text);
+  }
+
+  .mobile-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 150;
+  }
+
+  /* ── Main content ── */
+  .main {
+    flex: 1;
+    min-width: 0;
+    padding: 48px 48px 80px;
+    max-width: 900px;
+  }
+
+  @media (max-width: 900px) {
+    .main { padding: 48px 24px 80px; }
+  }
+
+  /* ── Page header ── */
+  .page-header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-header h1 {
+    font-size: clamp(24px, 4vw, 36px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+
+  .page-header .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 85ch;
+  }
+
+  .badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 100px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .badge-blue  { background: rgba(91,155,213,0.15); color: var(--blue); }
+  .badge-green { background: rgba(76,175,125,0.15); color: var(--green); }
+  .badge-red   { background: rgba(224,82,82,0.15);  color: var(--red); }
+  .badge-yellow{ background: rgba(232,184,75,0.15); color: var(--yellow); }
+  .badge-orange{ background: rgba(255,128,0,0.15);  color: var(--orange); }
+
+  /* ── Sections ── */
+  .section {
+    margin-bottom: 56px;
+    scroll-margin-top: 24px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .section-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .section-icon-blue   { background: rgba(91,155,213,0.15); }
+  .section-icon-green  { background: rgba(76,175,125,0.15); }
+  .section-icon-yellow { background: rgba(232,184,75,0.15); }
+  .section-icon-red    { background: rgba(224,82,82,0.15); }
+  .section-icon-purple { background: rgba(163,120,230,0.15); }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 12px;
+    margin-top: 28px;
+  }
+
+  h3:first-child { margin-top: 0; }
+
+  p {
+    color: var(--muted);
+    margin-bottom: 12px;
+    max-width: 85ch;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .component-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .component-card .part-num {
+    font-size: 10px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    background: var(--surface3);
+    color: var(--accent);
+    padding: 2px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .component-card .part-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+
+  .component-card .part-note {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── Tables ── */
+  .table-wrap {
+    overflow-x: auto;
+    margin-bottom: 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead tr {
+    background: var(--surface2);
+  }
+
+  th {
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .mono { font-family: var(--font-mono); font-size: 12px; color: var(--accent); }
+  .pin-chip {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: var(--surface3);
+    color: var(--accent);
+    padding: 1px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .color-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+
+  .dot-red    { background: var(--red); }
+  .dot-green  { background: var(--green); }
+  .dot-yellow { background: var(--yellow); }
+  .dot-blue   { background: var(--blue); }
+
+  /* ── Code blocks ── */
+  .code-block {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .code-block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: var(--surface3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-block-filename {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .copy-btn {
+    font-size: 11px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 3px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    transition: color 0.15s, background 0.15s;
+  }
+
+  .copy-btn:hover { color: var(--text); background: var(--surface2); }
+  .copy-btn.copied { color: var(--green); }
+
+  pre {
+    padding: 16px;
+    overflow-x: auto;
+    margin: 0;
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--text);
+    tab-size: 2;
+  }
+
+  .kw  { color: #c792ea; }
+  .cm  { color: #546e7a; font-style: italic; }
+  .str { color: #c3e88d; }
+  .num { color: #f78c6c; }
+  .fn  { color: #82aaff; }
+  .def { color: #ffcb6b; }
+  .inc { color: var(--green); }
+
+  /* ── State machine flow ── */
+  .state-flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .state-pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .state-pill.active { border-color: var(--accent); color: var(--accent); background: rgba(91,155,213,0.1); }
+  .state-pill.success { border-color: var(--green); color: var(--green); background: rgba(76,175,125,0.1); }
+  .state-pill.fail    { border-color: var(--red);   color: var(--red);   background: rgba(224,82,82,0.1); }
+
+  .flow-arrow { color: var(--faint); font-size: 16px; }
+
+  /* ── Callout boxes ── */
+  .callout {
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .callout-body { color: var(--muted); line-height: 1.6; }
+  .callout-body strong { color: var(--text); }
+
+  .callout-warning {
+    background: rgba(232,184,75,0.08);
+    border: 1px solid rgba(232,184,75,0.25);
+  }
+
+  .callout-info {
+    background: rgba(91,155,213,0.08);
+    border: 1px solid rgba(91,155,213,0.25);
+  }
+
+  .callout-success {
+    background: rgba(76,175,125,0.08);
+    border: 1px solid rgba(76,175,125,0.25);
+  }
+
+  /* ── Steps ── */
+  .step-list {
+    list-style: none;
+    counter-reset: steps;
+    margin-bottom: 16px;
+  }
+
+  .step-list li {
+    counter-increment: steps;
+    display: flex;
+    gap: 14px;
+    margin-bottom: 12px;
+    align-items: flex-start;
+  }
+
+  .step-list li::before {
+    content: counter(steps);
+    min-width: 24px;
+    height: 24px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-family: var(--font-mono);
+  }
+
+  .step-list li span { color: var(--muted); font-size: 13px; line-height: 1.6; }
+  .step-list li span strong { color: var(--text); }
+
+  /* ── File tree ── */
+  .file-tree {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 2;
+    margin-bottom: 16px;
+  }
+
+  .file-tree .dir  { color: var(--accent); }
+  .file-tree .file { color: var(--text); }
+  .file-tree .note { color: var(--faint); }
+
+  /* ── Divider ── */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .sidebar {
+      position: fixed;
+      left: -260px;
+      top: 0;
+      z-index: 160;
+      transition: left 0.25s ease;
+      height: 100vh;
+    }
+
+    .sidebar.open { left: 0; }
+
+    .mobile-overlay.open { display: block; }
+
+    .mobile-nav-toggle { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+
+    .main { padding: 56px 16px 60px; }
+
+    .card-grid { grid-template-columns: 1fr; }
+
+    .page-header h1 { font-size: 22px; }
+
+    .state-flow { gap: 6px; }
+    .state-pill { font-size: 11px; padding: 4px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="mobile-nav-toggle" onclick="toggleSidebar()" aria-label="Toggle navigation">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+  </svg>
+  Menu
+</button>
+
+<div class="mobile-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="layout">
+  <!-- ── Sidebar ── -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="rgba(91,155,213,0.15)"/>
+        <rect x="6" y="14" width="4" height="10" rx="1" fill="#5b9bd5"/>
+        <rect x="14" y="8" width="4" height="16" rx="1" fill="#4caf7d"/>
+        <rect x="22" y="11" width="4" height="13" rx="1" fill="#e8b84b"/>
+        <circle cx="8" cy="11" r="2" fill="#e05252"/>
+        <circle cx="16" cy="5" r="2" fill="#4caf7d"/>
+        <circle cx="24" cy="8" r="2" fill="#e8b84b"/>
+      </svg>
+      <div class="sidebar-title">Darth Faders</div>
+      <div class="sidebar-subtitle">Escape Room Puzzle</div>
+    </div>
+
+    <div class="nav-group-label">Overview</div>
+    <a class="nav-link" href="#overview">Introduction</a>
+    <a class="nav-link" href="#bom">Bill of Materials</a>
+    <a class="nav-link" href="#libraries">Libraries &amp; Board</a>
+
+    <div class="nav-group-label">Hardware</div>
+    <a class="nav-link" href="#stack">Feather Stack</a>
+    <a class="nav-link" href="#wiring">Wiring</a>
+    <a class="nav-link" href="#power">Power</a>
+    <a class="nav-link" href="#pins">Pin Assignments</a>
+    <a class="nav-link" href="#calibration">ADC Calibration</a>
+
+    <div class="nav-group-label">Firmware</div>
+    <a class="nav-link" href="#files">File & Model</a>
+    <a class="nav-link" href="#state-machine">State Machine</a>
+    <a class="nav-link" href="#api">Module API</a>
+
+    <div class="nav-group-label">Operation</div>
+    <a class="nav-link" href="#set-code">Setting the Code</a>
+    <a class="nav-link" href="#solving">Solving the Puzzle</a>
+    <a class="nav-link" href="#reveal">Reveal Mode</a>
+    <a class="nav-link" href="#reset">Factory Reset</a>
+    <a class="nav-link" href="#serial">Serial Debug</a>
+  </nav>
+
+  <!-- ── Main ── -->
+  <main class="main">
+
+    <!-- ── HEADER ── -->
+    <div class="page-header">
+      <h1>Darth Faders Puzzle/Trigger</h1>
+      <p class="subtitle">A 3-slider motorized puzzle using a Feather RP2040, motorized slide potentiometers, a bi-color 24-bar bargraph, and color-coded step switches which trigger a 3.5v signal to a dedicated pin to initiate or trigger another device. We used this as a way to unlock a secret door in our home. You could also use this as a puzzle in an escape room. Based on the <a href="https://learn.adafruit.com/darth-faders/build-the-darth-faders" style="color: green";>Adafruit Darth Faders project</a> by John Park. You can use that project for a guide to set up. We have not modified their 3D files, only added a top crown unit to hold the stepper switches and number plate for backpack. You can download the entire 3D print file bundle in our GitHub repository mentioned later in this project</p>
+      <div class="badge-row">
+        <span class="badge badge-green">CODE: C++</span>
+        <span class="badge badge-blue">CONTROLER: Feather RP2040</span>
+        <span class="badge badge-red">LOE: High; 8+ Hrs</span>
+        <span class="badge badge-orange">3D PRINTING: Yes</span>
+        <span class="badge badge-yellow">SKILL LEVEL: Moderate</span>
+      </div>
+      <p></p>
+            <div class="callout callout-info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-body"><strong>MOD/BRANCH IDEAS:</strong> The selected motorized sliders have a touch pin. This means if you utilized a capacitive slider knob, many of the functions which use the stepper switches could be eliminated simply by touching the slider.</div>
+      </div>
+    </div>
+
+    <!-- ── OVERVIEW ── -->
+    <section class="section" id="overview">
+      <div class="section-header">
+        <div class="section-icon section-icon-blue">🎛️</div>
+        <h2>Introduction</h2>
+      </div>
+      <p>Three motorized sliders each represent a value from 1–24. Players must move each slider to the correct position and confirm it using the matching colored step switch. When all three values match the stored code, the puzzle triggers a success output on a designated GPIO pin.</p>
+      <p>An admin (momentary) button enables setting a new code, revealing the current code, and factory resetting — all without modifying firmware.</p>
+      <div class="callout callout-info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-body">The solve code is stored in flash via the <strong>EEPROM</strong> library (built into the Arduino-Pico core) and survives power cycles and firmware re-uploads (unless you erase all flash).</div>
+      </div>
+    </section>
+
+    <!-- ── BOM ── -->
+    <section class="section" id="bom">
+      <div class="section-header">
+        <div class="section-icon section-icon-yellow">🛒</div>
+        <h2>Bill of Materials</h2>
+      </div>
+      <p>Materials below include Adafruit part numbers.</p>
+      <div class="card-grid">
+        <div class="component-card">
+          <div>
+            <div class="part-name">Feather RP2040</div>
+            <div class="part-note">Main MCU. USB-C, 3.3V logic, I²C, ADC.</div>
+          </div>
+          <div class="part-num">#4884</div>
+        </div>
+        <div class="component-card">
+          <div>
+            <div class="part-name">DC Motor + Stepper FeatherWing</div>
+            <div class="part-note">I²C motor driver. M1=Red, M2=Green, M3=Yellow.</div>
+          </div>
+          <div class="part-num">#2927</div>
+        </div>
+        <div class="component-card">
+          <div>
+            <div class="part-name">Motorized Slide Potentiometer</div>
+            <div class="part-note">10kΩ pot + DC motor. Qty: 3.</div>
+          </div>
+          <div class="part-num">#5466</div>
+        </div>
+        <div class="component-card">
+          <div>
+            <div class="part-name">Retro Step Switch with LED</div>
+            <div class="part-note">One red, one green, one yellow. Qty: 3.</div>
+          </div>
+          <div class="part-num">#5517</div>
+        </div>
+        <div class="component-card">
+          <div>
+            <div class="part-name">PB86 Step Switch Breakout PCB</div>
+            <div class="part-note">Breakout board for each step switch. Qty: 3.</div>
+          </div>
+          <div class="part-num">#5631</div>
+        </div>
+        <div class="component-card">
+          <div>
+            <div class="part-name">Bi-Color 24-Bar Bargraph I²C Backpack</div>
+            <div class="part-note">I²C addr 0x70. Supports RED, GREEN, YELLOW.</div>
+          </div>
+          <div class="part-num">#1721</div>
+        </div>
+        <div class="component-card">
+          <div>
+            <div class="part-name">Terminal Block Breakout FeatherWing</div>
+            <div class="part-note">terminals for all signal connections.</div>
+          </div>
+          <div class="part-num">#2926</div>
+        </div>
+        <div class="component-card">
+          <div>
+            <div class="part-name">DC Barrel Jack (2.1mm)</div>
+            <div class="part-note">9V power input to Motor FeatherWing.</div>
+          </div>
+          <div class="part-num">#610</div>
+        </div>
+        <div class="component-card">
+          <div>
+            <div class="part-name">9VDC 1000mA Power Adapter</div>
+            <div class="part-note">Single power source for motors and board.</div>
+          </div>
+          <div class="part-num">#63</div>
+        </div>
+        <div class="component-card">
+          <div>
+            <div class="part-name">MPM3610 5V Buck Converter</div>
+            <div class="part-note">Steps 9V Power supply down to 5V.</div>
+          </div>
+          <div class="part-num">#4739</div>
+        </div>
+        <div class="component-card">
+          <div>
+            <div class="part-name">Momentary Button</div>
+            <div class="part-note">Hidden admin button for SET / REVEAL / RESET.</div>
+          </div>
+          <div class="part-num">#1445</div>
+        </div>
+
+        <div class="component-card">
+          <div>
+            <div class="part-name">Stacking Headers</div>
+            <div class="part-note">12-pin and 16-pin female headers</div>
+          </div>
+          <div class="part-num">#2830</div>
+        </div>  
+        <div class="component-card">
+          <div>
+            <div class="part-name">Potentiometer Nubbin</div>
+            <div class="part-note">Rubber Slide Nubbin (pack of 3)</div>
+          </div>
+          <div class="part-num">#5621</div>
+        </div>
+        <div class="component-card">
+          <div>
+            <div class="part-name">Resistors</div>
+            <div class="part-note">100Ω resisters (use alternate valued resisters for brighter/dimmer LED's)</div>
+          </div>
+          <div class="part-num">#4293</div>
+        </div>
+        <div class="component-card">
+          <div>
+            <div class="part-name">12" Jumper Wires</div>
+            <div class="part-note">Primary wires for easy and secure component connections.</div>
+          </div>
+          <div class="part-num">#760</div>
+        </div>
+      </div>
+    </section>
+<!-- WIRING DIAGRAM -->
+<section id="wiring">
+<div class="container" id="wiring">
+  <div class="section-label">Schematic</div>
+  <h2>Wiring Diagram</h2>
+  <div class="diagram-wrap">
+    <div class="diagram-svg-wrap">
+<svg viewBox="0 0 960 650" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:'JetBrains Mono',monospace;">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#4a5568"/>
+    </marker>
+    <marker id="arr-r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#ef4444"/>
+    </marker>
+    <marker id="arr-g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#22c55e"/>
+    </marker>
+    <marker id="arr-y" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#f59e0b"/>
+    </marker>
+    <marker id="arr-b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#3b82f6"/>
+    </marker>
+    <marker id="arr-t" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#14b8a6"/>
+    </marker>
+    <marker id="arr-p" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#a78bfa"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="650" fill="#161b27" rx="8"/>
+
+  <!-- ===== 9V POWER ===== -->
+  <rect x="18" y="30" width="90" height="60" rx="10" fill="#1e2535" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="63" y="52" fill="#f59e0b" font-size="9" text-anchor="middle" font-weight="700">9V SUPPLY</text>
+  <text x="63" y="65" fill="#f59e0b" font-size="9" text-anchor="middle">BARREL</text>
+  <text x="63" y="78" fill="#4a5568" font-size="8" text-anchor="middle">Single source</text>
+
+  <!-- 9V direct to Motor FeatherWing (right then down) -->
+  <path d="M108 45 L135 45 L135 490 L150 490" stroke="#f59e0b" stroke-width="1.3" fill="none" marker-end="url(#arr-y)"/>
+  <text x="118" y="40" fill="#f59e0b" font-size="8">9V → Motor FeatherWing</text>
+
+  <!-- 9V down to DROK buck converter -->
+  <line x1="63" y1="90" x2="63" y2="130" stroke="#f59e0b" stroke-width="1.3" fill="none" marker-end="url(#arr-y)"/>
+
+  <!-- ===== DROK BUCK CONVERTER ===== -->
+  <rect x="18" y="130" width="90" height="48" rx="8" fill="#1e2535" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="63" y="150" fill="#22c55e" font-size="9" text-anchor="middle" font-weight="700">DC BUCK</text>
+  <text x="63" y="163" fill="#22c55e" font-size="9" text-anchor="middle">CONVERTER</text>
+  <text x="63" y="174" fill="#4a5568" font-size="7.5" text-anchor="middle">9V in → 5V out</text>
+
+  <!-- 5V out from DROK to USB-C pin on RP2040 -->
+  <path d="M63 179 L63 240 L130 240 L150 240" stroke="#22c55e" stroke-width="1.3" fill="none" marker-end="url(#arr-g)"/>
+  <text x="50" y="190" fill="#22c55e" font-size="7.5">5V → USB</text>
+
+  <!-- ===== ESP32 FEATHER V2 ===== -->
+  <rect x="150" y="180" width="130" height="270" rx="8" fill="#1e2535" stroke="#14b8a6" stroke-width="2"/>
+  <text x="215" y="200" fill="#14b8a6" font-size="10" text-anchor="middle" font-weight="700">FEATHER</text>
+  <text x="215" y="213" fill="#14b8a6" font-size="10" text-anchor="middle" font-weight="700">RP2040</text>
+  <text x="215" y="225" fill="#4a5568" font-size="7.5" text-anchor="middle">#4884</text>
+
+  <!-- Left pins -->
+  <text x="160" y="243" fill="#4a5568" font-size="8">USB-C</text>
+  <circle cx="150" cy="240" r="3" fill="#f59e0b"/>
+  <text x="160" y="261" fill="#4a5568" font-size="8">3V3</text>
+  <circle cx="150" cy="258" r="3" fill="#f59e0b"/>
+  <text x="160" y="279" fill="#4a5568" font-size="8">GND</text>
+  <circle cx="150" cy="276" r="3" fill="#4a5568"/>
+  <text x="160" y="297" fill="#4a5568" font-size="8">SDA 21</text>
+  <circle cx="150" cy="294" r="3" fill="#3b82f6"/>
+  <text x="160" y="315" fill="#4a5568" font-size="8">SCL 22</text>
+  <circle cx="150" cy="312" r="3" fill="#3b82f6"/>
+  <text x="160" y="333" fill="#4a5568" font-size="8">GPIO7</text>
+  <circle cx="150" cy="330" r="3" fill="#8892a4"/>
+  <text x="160" y="351" fill="#4a5568" font-size="8">GPIO24</text>
+  <circle cx="150" cy="348" r="3" fill="#a78bfa"/>
+
+  <!-- Right pins -->
+  <text x="270" y="261" fill="#4a5568" font-size="8" text-anchor="end">A0</text>
+  <circle cx="280" cy="258" r="3" fill="#ef4444"/>
+  <text x="270" y="279" fill="#4a5568" font-size="8" text-anchor="end">A1</text>
+  <circle cx="280" cy="276" r="3" fill="#22c55e"/>
+  <text x="270" y="297" fill="#4a5568" font-size="8" text-anchor="end">A2</text>
+  <circle cx="280" cy="294" r="3" fill="#f59e0b"/>
+  <text x="270" y="315" fill="#4a5568" font-size="8" text-anchor="end">GPIO12</text>
+  <circle cx="280" cy="312" r="3" fill="#ef4444"/>
+  <text x="270" y="333" fill="#4a5568" font-size="8" text-anchor="end">GPIO11</text>
+  <circle cx="280" cy="330" r="3" fill="#ef4444"/>
+  <text x="270" y="351" fill="#4a5568" font-size="8" text-anchor="end">GPIO13</text>
+  <circle cx="280" cy="348" r="3" fill="#22c55e"/>
+  <text x="270" y="369" fill="#4a5568" font-size="8" text-anchor="end">GPIO9</text>
+  <circle cx="280" cy="366" r="3" fill="#22c55e"/>
+  <text x="270" y="387" fill="#4a5568" font-size="8" text-anchor="end">GPIO10</text>
+  <circle cx="280" cy="384" r="3" fill="#f59e0b"/>
+  <text x="270" y="405" fill="#4a5568" font-size="8" text-anchor="end">GPIO8</text>
+  <circle cx="280" cy="402" r="3" fill="#f59e0b"/>
+
+  <!-- ===== FEATHERWING (Motor) ===== -->
+  <rect x="150" y="460" width="130" height="85" rx="8" fill="#1e2535" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="215" y="480" fill="#3b82f6" font-size="9" text-anchor="middle" font-weight="700">DC MOTOR</text>
+  <text x="215" y="492" fill="#3b82f6" font-size="9" text-anchor="middle" font-weight="700">FEATHERWING</text>
+  <text x="215" y="504" fill="#4a5568" font-size="8" text-anchor="middle">#2927  I²C: 0x60</text>
+  <text x="175" y="526" fill="#ef4444" font-size="9" font-weight="700">M1</text>
+  <text x="210" y="526" fill="#22c55e" font-size="9" font-weight="700">M2</text>
+  <text x="245" y="526" fill="#f59e0b" font-size="9" font-weight="700">M3</text>
+  <text x="175" y="538" fill="#4a5568" font-size="7">RED</text>
+  <text x="207" y="538" fill="#4a5568" font-size="7">GRN</text>
+  <text x="241" y="538" fill="#4a5568" font-size="7">YEL</text>
+
+  <!-- Stacked connection Feather→FeatherWing -->
+  <line x1="165" y1="450" x2="165" y2="460" stroke="#14b8a6" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <line x1="215" y1="450" x2="215" y2="460" stroke="#14b8a6" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <line x1="265" y1="450" x2="265" y2="460" stroke="#14b8a6" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="215" y="458" fill="#14b8a6" font-size="7" text-anchor="middle">⬇ STACKED</text>
+
+  <!-- ===== BARGRAPH ===== -->
+  <rect x="560" y="25" width="155" height="80" rx="8" fill="#1e2535" stroke="#14b8a6" stroke-width="1.5"/>
+  <text x="637" y="46" fill="#14b8a6" font-size="9" text-anchor="middle" font-weight="700">BI-COLOR BARGRAPH</text>
+  <text x="637" y="58" fill="#14b8a6" font-size="9" text-anchor="middle" font-weight="700">w/ I²C BACKPACK</text>
+  <text x="637" y="70" fill="#4a5568" font-size="8" text-anchor="middle">#1721  I²C: 0x71 (A0 bridged)</text>
+  <text x="573" y="91" fill="#4a5568" font-size="8">VCC</text>
+  <circle cx="570" cy="95" r="3" fill="#f59e0b"/>
+  <text x="598" y="91" fill="#4a5568" font-size="8">GND</text>
+  <circle cx="596" cy="95" r="3" fill="#4a5568"/>
+  <text x="623" y="91" fill="#4a5568" font-size="8">SDA</text>
+  <circle cx="622" cy="95" r="3" fill="#3b82f6"/>
+  <text x="648" y="91" fill="#4a5568" font-size="8">SCL</text>
+  <circle cx="648" cy="95" r="3" fill="#3b82f6"/>
+
+  <!-- I2C lines from Feather to Bargraph -->
+  <path d="M150 294 L100 294 L100 140 L622 140 L622 95" stroke="#3b82f6" stroke-width="1.5" fill="none" marker-end="url(#arr-b)"/>
+  <path d="M150 312 L95 312 L95 130 L648 130 L648 95" stroke="#3b82f6" stroke-width="1.3" fill="none" marker-end="url(#arr-b)"/>
+  <text x="365" y="138" fill="#3b82f6" font-size="8" text-anchor="middle">I²C BUS (SDA/SCL)</text>
+  <path d="M150 276 L120 276 L120 115 L595 115 L595 95" stroke="#4a5568" stroke-width="1.5" fill="none" marker-end="url(#arr)" stroke-dasharray="4,2"/>
+  <path d="M150 257 L130 257 L130 155 L570 155 L570 95" stroke="#f59e0b" stroke-width="1.2" fill="none" stroke-dasharray="3,2" marker-end="url(#arr-y)"/>
+  <text x="390" y="153" fill="#f59e0b" font-size="8" text-anchor="middle">3V3</text>
+
+  <!-- ===== MOTORIZED FADERS ===== -->
+  <!-- Red fader -->
+  <rect x="560" y="165" width="80" height="110" rx="6" fill="#1e2535" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="600" y="183" fill="#ef4444" font-size="9" text-anchor="middle" font-weight="700">RED FADER</text>
+  <text x="600" y="195" fill="#4a5568" font-size="7.5" text-anchor="middle">M1  A0</text>
+  <rect x="593" y="200" width="14" height="65" rx="3" fill="#0f1117" stroke="#4a5568" stroke-width="1"/>
+  <rect x="590" y="225" width="20" height="12" rx="2" fill="#ef4444" opacity="0.7"/>
+
+  <!-- Green fader -->
+  <rect x="655" y="165" width="80" height="110" rx="6" fill="#1e2535" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="695" y="183" fill="#22c55e" font-size="9" text-anchor="middle" font-weight="700">GREEN FADER</text>
+  <text x="695" y="195" fill="#4a5568" font-size="7.5" text-anchor="middle">M2  A1</text>
+  <rect x="688" y="200" width="14" height="65" rx="3" fill="#0f1117" stroke="#4a5568" stroke-width="1"/>
+  <rect x="685" y="205" width="20" height="12" rx="2" fill="#22c55e" opacity="0.7"/>
+
+  <!-- Yellow fader -->
+  <rect x="750" y="165" width="80" height="110" rx="6" fill="#1e2535" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="790" y="183" fill="#f59e0b" font-size="9" text-anchor="middle" font-weight="700">YELLOW FADER</text>
+  <text x="790" y="195" fill="#4a5568" font-size="7.5" text-anchor="middle">M3  A2</text>
+  <rect x="783" y="200" width="14" height="65" rx="3" fill="#0f1117" stroke="#4a5568" stroke-width="1"/>
+  <rect x="780" y="235" width="20" height="12" rx="2" fill="#f59e0b" opacity="0.7"/>
+
+  <!-- Wiper ADC wires -->
+  <path d="M280 258 L560 258" stroke="#ef4444" stroke-width="1.5" fill="none" marker-end="url(#arr-r)"/>
+  <path d="M280 276 L655 240" stroke="#22c55e" stroke-width="1.5" fill="none" marker-end="url(#arr-g)"/>
+  <path d="M280 294 L750 265" stroke="#f59e0b" stroke-width="1.5" fill="none" marker-end="url(#arr-y)"/>
+  <text x="420" y="253" fill="#ef4444" font-size="8">Wiper A0 (ADC)</text>
+  <text x="430" y="270" fill="#22c55e" font-size="8">Wiper A1 (ADC)</text>
+  <text x="440" y="288" fill="#f59e0b" font-size="8">Wiper A2 (ADC)</text>
+
+  <!-- Motor wires from FeatherWing M1/M2/M3 -->
+  <path d="M175 545 L175 570 L630 570 L630 275" stroke="#ef4444" stroke-width="1.5" fill="none" marker-end="url(#arr-r)" stroke-dasharray="5,2"/>
+  <path d="M210 545 L210 580 L710 580 L710 275" stroke="#22c55e" stroke-width="1.5" fill="none" marker-end="url(#arr-g)" stroke-dasharray="5,2"/>
+  <path d="M245 545 L245 590 L790 590 L790 275" stroke="#f59e0b" stroke-width="1.5" fill="none" marker-end="url(#arr-y)" stroke-dasharray="5,2"/>
+  <text x="480" y="568" fill="#ef4444" font-size="8">M1 motor (Red)</text>
+  <text x="480" y="580" fill="#22c55e" font-size="8">M2 motor (Green)</text>
+  <text x="480" y="592" fill="#f59e0b" font-size="8">M3 motor (Yellow)</text>
+
+  <!-- ===== STEP SWITCHES ===== -->
+  <!-- Red button -->
+  <rect x="560" y="305" width="65" height="75" rx="6" fill="#1e2535" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="592" y="323" fill="#ef4444" font-size="9" text-anchor="middle" font-weight="700">RED SW</text>
+  <text x="592" y="335" fill="#4a5568" font-size="7.5" text-anchor="middle">G12 / LED11</text>
+  <circle cx="592" cy="353" r="10" fill="#0f1117" stroke="#ef4444" stroke-width="1.5"/>
+  <circle cx="592" cy="353" r="5" fill="#ef4444" opacity="0.6"/>
+
+  <!-- Green button -->
+  <rect x="640" y="305" width="65" height="75" rx="6" fill="#1e2535" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="672" y="323" fill="#22c55e" font-size="9" text-anchor="middle" font-weight="700">GRN SW</text>
+  <text x="672" y="335" fill="#4a5568" font-size="7.5" text-anchor="middle">G13 / LED9</text>
+  <circle cx="672" cy="353" r="10" fill="#0f1117" stroke="#22c55e" stroke-width="1.5"/>
+  <circle cx="672" cy="353" r="5" fill="#22c55e" opacity="0.6"/>
+
+  <!-- Yellow button -->
+  <rect x="720" y="305" width="65" height="75" rx="6" fill="#1e2535" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="752" y="323" fill="#f59e0b" font-size="9" text-anchor="middle" font-weight="700">YEL SW</text>
+  <text x="752" y="335" fill="#4a5568" font-size="7.5" text-anchor="middle">G10 / LED8</text>
+  <circle cx="752" cy="353" r="10" fill="#0f1117" stroke="#f59e0b" stroke-width="1.5"/>
+  <circle cx="752" cy="353" r="5" fill="#f59e0b" opacity="0.6"/>
+
+  <!-- Momentary button -->
+  <rect x="800" y="305" width="70" height="75" rx="6" fill="#1e2535" stroke="#8892a4" stroke-width="1.5"/>
+  <text x="835" y="321" fill="#8892a4" font-size="8" text-anchor="middle" font-weight="700">MOMENTARY</text>
+  <text x="835" y="332" fill="#4a5568" font-size="7.5" text-anchor="middle">GPIO7 #1445</text>
+  <text x="835" y="343" fill="#4a5568" font-size="7" text-anchor="middle">Hold 5s→SET</text>
+  <text x="835" y="353" fill="#4a5568" font-size="7" text-anchor="middle">Hold 10s→RESET</text>
+  <circle cx="835" cy="365" r="10" fill="#0f1117" stroke="#8892a4" stroke-width="1.5"/>
+  <circle cx="835" cy="365" r="5" fill="#8892a4" opacity="0.5"/>
+  <path d="M150 330 L130 330 L130 420 L820 420 L820 380" stroke="#8892a4" stroke-width="1.2" fill="none" marker-end="url(#arr)"/>
+  
+  <!-- Switch wires (SW input) -->
+  <path d="M280 312 L560 340" stroke="#ef4444" stroke-width="1.2" fill="none" marker-end="url(#arr-r)"/>
+  <path d="M280 348 L640 348" stroke="#22c55e" stroke-width="1.2" fill="none" marker-end="url(#arr-g)"/>
+  <path d="M280 384 L720 360" stroke="#f59e0b" stroke-width="1.2" fill="none" marker-end="url(#arr-y)"/>
+
+
+  <!-- LED wires (dashed) -->
+  <path d="M280 330 L560 360" stroke="#ef4444" stroke-width="1.2" fill="none" stroke-dasharray="3,2" marker-end="url(#arr-r)"/>
+  <path d="M280 366 L640 368" stroke="#22c55e" stroke-width="1.2" fill="none" stroke-dasharray="3,2" marker-end="url(#arr-g)"/>
+  <path d="M280 402 L720 372" stroke="#f59e0b" stroke-width="1.2" fill="none" stroke-dasharray="3,2" marker-end="url(#arr-y)"/>
+  <text x="320" y="329" fill="#ef4444" font-size="7.5">SW / LED</text>
+  <text x="320" y="358" fill="#22c55e" font-size="7.5">SW / LED</text>
+  <text x="320" y="390" fill="#f59e0b" font-size="7.5">SW / LED</text>
+  
+
+  <!-- ===== TRIGGER OUTPUT ===== -->
+  <rect x="18" y="310" width="80" height="50" rx="6" fill="#1e2535" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="58" y="330" fill="#a78bfa" font-size="9" text-anchor="middle" font-weight="700">TRIGGER OUT</text>
+  <text x="58" y="343" fill="#4a5568" font-size="8" text-anchor="middle">D24 [GPIO24]</text>
+  <text x="58" y="354" fill="#4a5568" font-size="7.5" text-anchor="middle">relay/lock/audio</text>
+  <path d="M150 348 L100 348" stroke="#a78bfa" stroke-width="1.5" fill="none" marker-end="url(#arr-p)"/>
+
+  <rect x="800" y="430" width="140" height="190" rx="6" fill="#1e2535" stroke="#4a5568" stroke-width="1"/>
+  <text x="870" y="447" fill="#8892a4" font-size="9" text-anchor="middle" font-weight="700">LEGEND</text>
+  <line x1="810" y1="458" x2="840" y2="458" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="850" y="461" fill="#4a5568" font-size="8">I²C (SDA/SCL)</text>
+  <line x1="810" y1="472" x2="840" y2="472" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="850" y="475" fill="#4a5568" font-size="8">9V power</text>
+  <line x1="810" y1="486" x2="840" y2="486" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="850" y="489" fill="#4a5568" font-size="8">5V (buck → USB)</text>
+  <line x1="810" y1="500" x2="840" y2="500" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="850" y="503" fill="#4a5568" font-size="8">Red channel</text>
+  <line x1="810" y1="514" x2="840" y2="514" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="850" y="517" fill="#4a5568" font-size="8">Green channel</text>
+  <line x1="810" y1="528" x2="840" y2="528" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="850" y="531" fill="#4a5568" font-size="8">Yellow channel</text>
+  <line x1="810" y1="542" x2="840" y2="542" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="850" y="545" fill="#4a5568" font-size="8">Trigger out</text>
+  <line x1="810" y1="556" x2="840" y2="556" stroke="#4a5568" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="850" y="559" fill="#4a5568" font-size="8">Motor wire</text>
+  <line x1="810" y1="570" x2="840" y2="570" stroke="#14b8a6" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="850" y="573" fill="#4a5568" font-size="8">Stacked conn.</text>
+  <line x1="810" y1="584" x2="840" y2="584" stroke="#8892a4" stroke-width="1.5"/>
+  <text x="850" y="587" fill="#4a5568" font-size="8">Momentary btn</text>
+
+
+  <!-- Title -->
+  <text x="480" y="635" fill="#4a5568" font-size="9" text-anchor="middle">Darth Faders Escape Puzzle — Wiring Reference v5 — Feather RP2040 + DC Motor FeatherWing #2927 + Terminal Block #2926</text>
+</svg>
+    </div>
+  </div>
+</div>
+</section>
+
+
+ <img src="https://cdn-learn.adafruit.com/assets/assets/000/107/203/large1024/adafruit_products_feather-rp2040-pins.png?1639162603" class="responsive-img">
+
+    <!-- ── LIBRARIES ── -->
+    <section class="section" id="libraries">
+      <div class="section-header">
+        <div class="section-icon section-icon-blue">📦</div>
+        <h2>Libraries &amp; Board Setup</h2>
+      </div>
+      <p>Install the following via <strong>Arduino IDE → Tools → Manage Libraries</strong>:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Library</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">Adafruit Motor Shield V2</td><td>Controls DC motors via I²C Motor FeatherWing</td></tr>
+            <tr><td class="mono">Adafruit LED Backpack Library</td><td>Drives the 24-bar bargraph display</td></tr>
+            <tr><td class="mono">Adafruit GFX Library</td><td>Dependency of LED Backpack</td></tr>
+            <tr><td class="mono">EEPROM</td><td>Built into Arduino-Pico core — no install needed. Stores solve code in flash.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>For the board, install the <strong>Raspberry Pi Pico / RP2040</strong> board package by Earle Philhower and select <strong>Adafruit Feather RP2040</strong>.</p>
+    </section>
+
+    <!-- ── STACK ── -->
+    <section class="section" id="stack">
+      <div class="section-header">
+        <div class="section-icon section-icon-green">🔩</div>
+        <h2>Feather Stack Assembly</h2>
+      </div>
+      <p>Stack the boards in this order, bottom to top, using stacking headers:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Position</th><th>Board</th><th>Adafruit #</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Bottom</td><td>Terminal Block Breakout FeatherWing</td><td class="mono">#2926</td><td>Provides screw terminals for all external wiring. 5V USB input from DC Buck converter to USB pin powers the RP2040.</td></tr>
+            <tr><td>Middle</td><td>Feather RP2040</td><td class="mono">#4884</td><td>MCU; USB-C for programming. Powered via Terminal Block USB pin in field.</td></tr>
+            <tr><td>Top</td><td>DC Motor + Stepper FeatherWing</td><td class="mono">#2927</td><td>I²C motor driver; receives full 9V from barrel jack. This is placed on top for easy access to wire terminals</td></tr>
+          </tbody>
+        </table>
+              </div>
+      <div class="callout callout-warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">Do <strong>not</strong> use the 9V power supply and the 5V USB at the same time when Feather Stack is assembled! You should use the USB-C for programming and/or troubleshooting, then switch to the 9V/BUCK input supply for field use, or disassemble Feather Stack to use both power sources.</div>
+      </div>
+
+    </section>
+
+    <!-- ── WIRING ── -->
+    <section class="section" id="pins">
+      <div class="section-header">
+        <div class="section-icon section-icon-yellow">🔌</div>
+        <h2>Pin Assignments</h2>
+      </div>
+
+      <h3>Slider Potentiometers</h3>
+      <p>Each motorized slider has 5 connections: Motor+, Motor–, Wiper (ADC), Track-Top (3.3V), Track-Bottom (GND).</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Slider</th><th>Motor+</th><th>Motor–</th><th>Wiper → RP2040</th><th>Track Top</th><th>Track Bottom</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="color-dot dot-red"></span>Red</td>
+              <td class="mono">M1A</td><td class="mono">M1B</td>
+              <td><span class="pin-chip">A0 [GPIO26]</span></td>
+              <td>3.3V</td><td>GND</td>
+            </tr>
+            <tr>
+              <td><span class="color-dot dot-green"></span>Green</td>
+              <td class="mono">M2A</td><td class="mono">M2B</td>
+              <td><span class="pin-chip">A1 [GPIO27]</span></td>
+              <td>3.3V</td><td>GND</td>
+            </tr>
+            <tr>
+              <td><span class="color-dot dot-yellow"></span>Yellow</td>
+              <td class="mono">M3A</td><td class="mono">M3B</td>
+              <td><span class="pin-chip">A2 [GPIO28]</span></td>
+              <td>3.3V</td><td>GND</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Step Switches via PB86 Breakout</h3>
+      <div class="callout callout-info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-body"><strong>INPUT_PULLUP</strong> is enabled in firmware — no external pull-up resistors needed on switch pins. Add a <strong>100–220Ω resistor</strong> in series with each LED+ line.</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Switch</th><th>Input Pin (SW+)</th><th>LED Pin (LED+)</th><th>SW– / LED–</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="color-dot dot-red"></span>Red</td>
+              <td><span class="pin-chip">D12 [GPIO12]</span></td>
+              <td><span class="pin-chip">D11 [GPIO11]</span></td>
+              <td>GND</td>
+            </tr>
+            <tr>
+              <td><span class="color-dot dot-green"></span>Green</td>
+              <td><span class="pin-chip">D13 [GPIO13]</span></td>
+              <td><span class="pin-chip">D9 [GPIO9]</span></td>
+              <td>GND</td>
+            </tr>
+            <tr>
+              <td><span class="color-dot dot-yellow"></span>Yellow</td>
+              <td><span class="pin-chip">D10 [GPIO10]</span></td>
+              <td><span class="pin-chip">D6 [GPIO8]</span></td>
+              <td>GND</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Momentary Button</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Connection</th><th>Pin</th></tr></thead>
+          <tbody>
+            <tr><td>One leg</td><td><span class="pin-chip">D5 [GPIO7]</span></td></tr>
+            <tr><td>Other leg</td><td>GND</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Bargraph I²C Backpack</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Backpack Pin</th><th>RP2040 Pin</th></tr></thead>
+          <tbody>
+            <tr><td>SDA</td><td><span class="pin-chip">SDA [GPIO2]</span></td></tr>
+            <tr><td>SCL</td><td><span class="pin-chip">SCL [GPIO3]</span></td></tr>
+            <tr><td>VCC</td><td>3.3V</td></tr>
+            <tr><td>GND</td><td>GND</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>I²C address in use: <span class="pin-chip">0x71</span> — set in <code>config.h</code> as <code>BARGRAPH_ADDR</code>.</p>
+      <div class="callout callout-warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body"><strong>A0 solder jumper required.</strong> The backpack ships with a default address of <strong>0x70</strong>, which conflicts with the DC Motor FeatherWing (#2927) on this build. To resolve this, bridge the <strong>A0 jumper</strong> on the back of the bargraph backpack — this shifts the address to <strong>0x71</strong>, which is what <code>BARGRAPH_ADDR</code> in <code>config.h</code> is set to. If you ever swap or replace the backpack, remember to bridge A0 before powering up.</div>
+      </div>
+
+      <h3>Trigger Output (Correct Solve)</h3>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Signal</th><th>Default Pin</th><th>Behavior</th></tr></thead>
+          <tbody>
+            <tr><td>Trigger</td><td><span class="pin-chip">D24 [GPIO24]</span></td><td>HIGH for 3 seconds on correct solve</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── POWER ── -->
+    <section class="section" id="power">
+      <div class="section-header">
+        <div class="section-icon section-icon-red">⚡</div>
+        <h2>Power</h2>
+      </div>
+      <p>A single 9V barrel jack powers the entire project. A DC buck converter splits that supply into two paths — full 9V to the motor breakout board, and a regulated 5V to the RP2040.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Source</th><th>Connection</th><th>Powers</th></tr></thead>
+          <tbody>
+            <tr><td>9V Barrel Jack</td><td>Motor FeatherWing VIN + GND</td><td>DC motors (full 9V)</td></tr>
+            <tr><td>9V Barrel Jack → Buck Converter → 5V out</td><td>USB port on Terminal Block FeatherWing</td><td>RP2040 + all logic</td></tr>
+            <tr><td>USB-C on RP2040</td><td>Direct to RP2040</td><td>Programming and development only</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout callout-info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-body"><strong>Buck converter setup:</strong> If using a multi variable output Buck converter, ensure you set to exactly <strong>5V</strong> before connecting it to the Terminal Block USB input. Most Buck modules have a small trim potentiometer — use a multimeter to confirm the output voltage before plugging in the board.</div>
+      </div>
+      <div class="callout callout-warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">Do <strong>not</strong> use the 9V power supply and the 5V USB at the same time when Feather Stack is assembled! You should use the USB-C for programming and/or troubleshooting, then switch to the 9V/BUCK input supply for field use, or disassemble Feather Stack to use both power sources.</div>
+      </div>
+    </section>
+
+    <!-- ── CALIBRATION ── -->
+    <section class="section" id="calibration">
+      <div class="section-header">
+        <div class="section-icon section-icon-blue">📐</div>
+        <h2>ADC Calibration</h2>
+      </div>
+      <div class="callout callout-success">
+        <span class="callout-icon">✅</span>
+        <div class="callout-body"><strong>No manual calibration required.</strong> The firmware automatically calibrates all three sliders on every boot — no measuring, no code changes, no re-uploading.</div>
+      </div>
+      <p>On every power-up, <code>calibrateSliders()</code> runs automatically inside <code>puzzleInit()</code> before the puzzle becomes active. It physically sweeps all three sliders through their full range, reads the real ADC values from your specific hardware, and sets the calibration range in memory. The puzzle then starts with accurate, hardware-matched calibration every single time.</p>
+
+      <h3>What you'll see on boot</h3>
+      <ol class="step-list">
+        <li><span>All three sliders drive to the <strong>physical bottom</strong> simultaneously.</span></li>
+        <li><span>The bargraph fills red from <strong>top to bottom</strong> — confirming the low readings have been taken.</span></li>
+        <li><span>All three sliders drive to the <strong>physical top</strong> simultaneously.</span></li>
+        <li><span>The bargraph fills green from <strong>bottom to top</strong> — confirming the high readings have been taken.</span></li>
+        <li><span>All three sliders return to the <strong>bottom</strong>. Bargraph clears. Puzzle enters IDLE and is ready.</span></li>
+      </ol>
+
+      <h3>How it works</h3>
+      <p>The calibration sweep takes the lowest raw ADC reading across all three sliders at the bottom position and the highest reading at the top, then trims a <code>ADC_CAL_MARGIN</code> (50 counts) off each end as a safety buffer. The resulting values are stored in the runtime variables <code>adcMin</code> and <code>adcMax</code>, which <code>readSlider()</code> uses to map raw ADC values to the 1–24 step range.</p>
+      <p>If the calibration produces a degenerate result — for example if a motor isn't connected — the firmware falls back to the <code>ADC_MIN_DEFAULT</code> / <code>ADC_MAX_DEFAULT</code> constants in <code>config.h</code> and logs a warning to Serial.</p>
+
+      <h3>Verifying calibration via Serial Monitor</h3>
+      <p>Open Serial Monitor at <strong>115200 baud</strong> during boot to see the raw readings for each slider and the final computed range:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-filename">Serial Monitor — calibration output</span>
+        </div>
+        <pre><code>[Cal] Starting auto-calibration...
+[Cal] Low raw[0] = 42
+[Cal] Low raw[1] = 38
+[Cal] Low raw[2] = 45
+[Cal] High raw[0] = 4051
+[Cal] High raw[1] = 4043
+[Cal] High raw[2] = 4058
+[Cal] adcMin=88  adcMax=3993
+[Cal] Calibration complete</code></pre>
+      </div>
+      <div class="callout callout-warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">If you see <strong>[Cal] WARNING: bad calibration range</strong> in Serial output, check that all three motor wires are connected and the 9V supply is present before the RP2040 boots.</div>
+      </div>
+    </section>
+
+    <!-- ── FILES ── -->
+    <section class="section" id="files">
+      <div class="section-header">
+        <div class="section-icon section-icon-blue">📁</div>
+        <h2>Files & Model</h2>
+      </div>
+      <p>All files live in the <strong>same folder</strong> — no subfolders. The folder name must match the <code>.ino</code> filename exactly.</p>
+              <div class="code-block-header">
+
+                  <span class="code-block-filename">Download <strong>firmware & 3D Models</strong> in our GitHub repository.</span>
+          <button class="copy-btn" onclick="window.open('https://github.com/trackindustries/Darth-Faders-Puzzle/tree/main', '_blank', 'noopener,noreferrer');">GitHub</button>
+
+      </div>
+      <div class="file-tree">
+        <div><span class="dir">darth_faders_puzzle/</span></div>
+        <div>&nbsp;&nbsp;<span class="file">darth_faders_puzzle.ino</span> &nbsp;<span class="note">← entry point: setup() and loop()</span></div>
+        <div>&nbsp;&nbsp;<span class="file">config.h</span> &nbsp;<span class="note">← all pins, timing, ADC constants</span></div>
+        <div>&nbsp;&nbsp;<span class="file">motors.h / motors.cpp</span> &nbsp;<span class="note">← Motor FeatherWing abstraction</span></div>
+        <div>&nbsp;&nbsp;<span class="file">bargraph.h / bargraph.cpp</span> &nbsp;<span class="note">← 24-bar bargraph display driver</span></div>
+        <div>&nbsp;&nbsp;<span class="file">switches.h / switches.cpp</span> &nbsp;<span class="note">← switch debounce, LED blink engine</span></div>
+        <div>&nbsp;&nbsp;<span class="file">puzzle.h / puzzle.cpp</span> &nbsp;<span class="note">← full puzzle state machine</span></div>
+        <div>&nbsp;&nbsp;<span class="file">WIRING_AND_SETUP.md</span> &nbsp;<span class="note">← wiring reference</span></div>
+      </div>
+
+
+    </section>
+
+
+    <!-- ── STATE MACHINE ── -->
+    <section class="section" id="state-machine">
+      <div class="section-header">
+        <div class="section-icon section-icon-purple">🔄</div>
+        <h2>State Machine</h2>
+      </div>
+
+      <div class="state-flow">
+        <span class="state-pill active">STATE_IDLE</span>
+        <span class="flow-arrow">→</span>
+        <span class="state-pill active">STATE_SOLVE</span>
+        <span class="flow-arrow">→</span>
+        <span class="state-pill success">STATE_SUCCESS</span>
+        <span class="flow-arrow">/</span>
+        <span class="state-pill fail">STATE_FAIL</span>
+      </div>
+      <div class="state-flow">
+        <span class="state-pill">STATE_IDLE</span>
+        <span class="flow-arrow">→</span>
+        <span class="state-pill active">STATE_SET</span>
+        <span class="flow-arrow">→</span>
+        <span class="state-pill active">STATE_SET_COLOR</span>
+        <span class="flow-arrow">→ confirm →</span>
+        <span class="state-pill">STATE_IDLE</span>
+      </div>
+      <div class="state-flow">
+        <span class="state-pill">STATE_SOLVE</span>
+        <span class="flow-arrow">→ all 3 active + hold 5s →</span>
+        <span class="state-pill active">STATE_REVEAL</span>
+        <span class="flow-arrow">→ press →</span>
+        <span class="state-pill">STATE_IDLE</span>
+      </div>
+
+      <div class="table-wrap" style="margin-top:20px">
+        <table>
+          <thead><tr><th>State</th><th>Step Switch LEDs</th><th>Bargraph</th><th>Sliders</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">STATE_IDLE</td><td>All off</td><td>Off</td><td>Bottom (pos 1)</td></tr>
+            <tr><td class="mono">STATE_SOLVE</td><td>Active color blinks slow; locked color solid</td><td>Active color fills 1→N as slider moves</td><td>Active slider free to move</td></tr>
+            <tr><td class="mono">STATE_SET</td><td>Unset colors blink fast; set colors solid</td><td>Shows confirmed positions</td><td>Free</td></tr>
+            <tr><td class="mono">STATE_SET_COLOR</td><td>Active color blinks slow</td><td>Active color fills 1→N</td><td>Active slider free</td></tr>
+            <tr><td class="mono">STATE_REVEAL</td><td>All blink slow</td><td>All 3 solve values shown in color</td><td>Move to stored code positions</td></tr>
+            <tr><td class="mono">STATE_SUCCESS</td><td>All very-fast-flash 4s → off</td><td>Spectrum sweep (red/green/yellow) bounces top↔bottom</td><td>Center→Top→Bottom→Top→Bottom</td></tr>
+            <tr><td class="mono">STATE_FAIL</td><td>All off</td><td>Off</td><td>Return to bottom</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── API ── -->
+    <section class="section" id="api">
+      <div class="section-header">
+        <div class="section-icon section-icon-blue">📖</div>
+        <h2>Module API Reference</h2>
+      </div>
+
+      <h3>motors.h</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Function</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">motorsInit()</td><td>Initializes Motor FeatherWing over I²C</td></tr>
+            <tr><td class="mono">motorBrake(ch)</td><td>Immediately brakes motor on channel 1–3</td></tr>
+            <tr><td class="mono">motorToTop(ch)</td><td>Open-loop: runs motor up until top end-stop</td></tr>
+            <tr><td class="mono">motorToBottom(ch)</td><td>Open-loop: runs motor down to bottom</td></tr>
+            <tr><td class="mono">motorToCenter(ch)</td><td>Open-loop: moves to approximate center</td></tr>
+            <tr><td class="mono">allMotorsToTop/Bottom/Center()</td><td>Runs all three simultaneously</td></tr>
+            <tr><td class="mono">motorMoveToValue(ch, pin, val, adcMin, adcMax)</td><td>Closed-loop: drives until ADC reads val (1–24), 5s timeout</td></tr>
+            <tr><td class="mono">allMotorsMoveToValues(pinR, valR, pinG, valG, pinY, valY, adcMin, adcMax)</td><td>Closed-loop: drives all three motors simultaneously to target values, 5s timeout</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>bargraph.h</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Function</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">bargraphInit()</td><td>Initializes backpack at BARGRAPH_ADDR</td></tr>
+            <tr><td class="mono">bargraphClear()</td><td>Turns all 24 LEDs off</td></tr>
+            <tr><td class="mono">bargraphShowValue(val, color)</td><td>Fills LEDs 1..val with color (BAR_RED/GREEN/YELLOW)</td></tr>
+            <tr><td class="mono">bargraphShowSingle(pos, color)</td><td>Lights single LED at position 1–24</td></tr>
+            <tr><td class="mono">bargraphShowLocked(r, g, y)</td><td>Shows up to 3 pinned LEDs; handles alternating if shared</td></tr>
+            <tr><td class="mono">bargraphSetAlternating(pos, c1, c2)</td><td>Makes a LED alternate between two colors at ALT_COLOR_MS</td></tr>
+            <tr><td class="mono">bargraphUpdate()</td><td>Must be called every loop() to drive alternating animation</td></tr>
+            <tr><td class="mono">bargraphShowSpectrum(fillTo)</td><td>Fills LEDs 1..fillTo cycling red/green/yellow — used for success and factory reset animations</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>switches.h</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Function</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">switchesInit()</td><td>Configures all switch and LED pins</td></tr>
+            <tr><td class="mono">switchesUpdate()</td><td>Must be called every loop() — debounce + blink engine</td></tr>
+            <tr><td class="mono">switchPressed(idx)</td><td>Returns true once on falling edge (0=Red, 1=Green, 2=Yellow)</td></tr>
+            <tr><td class="mono">momentaryPressed()</td><td>Returns true once on momentary button falling edge</td></tr>
+            <tr><td class="mono">momentaryHeld(&amp;ms)</td><td>Returns true while held; fills ms with elapsed hold time</td></tr>
+            <tr><td class="mono">switchSetLed(idx, mode)</td><td>LED_OFF / LED_ON / LED_BLINK_SLOW / LED_BLINK_FAST / LED_BLINK_VFAST</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── SET CODE ── -->
+    <section class="section" id="set-code">
+      <div class="section-header">
+        <div class="section-icon section-icon-yellow">🔐</div>
+        <h2>Setting the Solve Code</h2>
+      </div>
+      <div class="callout callout-info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-body"><strong>Prerequisite:</strong> No step switches may be in solve mode (all LEDs off) when you begin the hold.</div>
+      </div>
+      <ol class="step-list">
+        <li><span>Hold the momentary button for <strong>5 seconds</strong> → enters SET mode. All three step switch LEDs blink fast.</span></li>
+        <li><span>Press any step switch (e.g. Red) → its LED changes to slow blink, indicating you are now setting that color's value.</span></li>
+        <li><span>Move that slider up or down → the bargraph fills in the corresponding color, showing the current value (1–24).</span></li>
+        <li><span>Press the <strong>same step switch again</strong> → value is locked. LED goes solid. Bargraph shows a single LED at the locked position.</span></li>
+        <li><span>Repeat steps 2–4 for the remaining two colors. When each is set its LED is solid; unset colors continue to blink fast.</span></li>
+        <li><span>If two colors share the same value, the bargraph LED at that position will <strong>alternate between both colors</strong> every 500ms.</span></li>
+        <li><span>Once all three LEDs are solid, press the momentary button once → code is saved to EEPROM flash → celebration sequence plays → puzzle returns to IDLE.</span></li>
+      </ol>
+    </section>
+
+    <!-- ── SOLVING ── -->
+    <section class="section" id="solving">
+      <div class="section-header">
+        <div class="section-icon section-icon-green">🧩</div>
+        <h2>Solving the Puzzle</h2>
+      </div>
+      <ol class="step-list">
+        <li><span>From IDLE, press any step switch → its LED blinks slow (that color is now in solve mode).</span></li>
+        <li><span>Move that slider → the bargraph fills in that color, showing position 1–24 in real time.</span></li>
+        <li><span>Press the <strong>same switch again</strong> → value locked. LED goes solid.</span></li>
+        <li><span>Repeat for the other colors in any order. Additional colors can be placed in solve mode at any time by pressing their switch.</span></li>
+        <li><span>When all three LEDs are solid, the code is evaluated automatically.</span></li>
+      </ol>
+      <div class="card-grid">
+        <div class="card" style="border-color: rgba(76,175,125,0.4);">
+          <h3 style="color:var(--green); margin-top:0">✅ Correct Code</h3>
+          <p style="margin:0; font-size:13px;">All LEDs flash very fast for 4 seconds → sliders perform victory dance (Center → Top → Bottom → Top → Bottom) → D24 (GPIO24) goes HIGH for 3 seconds → puzzle returns to IDLE.</p>
+        </div>
+        <div class="card" style="border-color: rgba(224,82,82,0.4);">
+          <h3 style="color:var(--red); margin-top:0">❌ Wrong Code</h3>
+          <p style="margin:0; font-size:13px;">All LEDs go off → bargraph clears → all sliders return to the bottom (position 1) → puzzle returns to IDLE.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── REVEAL ── -->
+    <section class="section" id="reveal">
+      <div class="section-header">
+        <div class="section-icon section-icon-blue">👁️</div>
+        <h2>Reveal Mode</h2>
+      </div>
+      <p>Allows the puzzle operator to view the currently stored solve code without resetting it.</p>
+      <ol class="step-list">
+        <li><span>Press <strong>all three step switches</strong> (any order) so all three LEDs are blinking slowly.</span></li>
+        <li><span>Hold the momentary button for <strong>5 seconds</strong> → enters REVEAL mode.</span></li>
+        <li><span>All three sliders motor to their stored solve positions. The bargraph displays all three values in their respective colors.</span></li>
+        <li><span>Press the momentary button once → all LEDs turn off, sliders return to bottom, bargraph clears, puzzle returns to IDLE.</span></li>
+      </ol>
+    </section>
+
+    <!-- ── RESET ── -->
+    <section class="section" id="reset">
+      <div class="section-header">
+        <div class="section-icon section-icon-red">🔄</div>
+        <h2>Factory Reset</h2>
+      </div>
+      <div class="callout callout-warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">The stored solve code will be overwritten with <strong>7 / 7 / 7</strong>.</div>
+      </div>
+      <ol class="step-list">
+        <li><span>Ensure the puzzle is in IDLE state with <strong>all step switch LEDs off</strong> (no switches in solve mode).</span></li>
+        <li><span>Hold the momentary button for <strong>10 seconds</strong>.</span></li>
+        <li><span>After 5 seconds you will be in SET mode — the step switch LEDs will start to flash rapidly. <strong>Continue holding the button down</strong> for another 5 seconds until the bargraph illuminates.</span></li>
+        <li><span>A spectrum bargraph sweep plays (top to bottom, then bottom to top) → solve code resets to 7/7/7 in EEPROM → puzzle returns to IDLE.</span></li>
+      </ol>
+    </section>
+
+    <!-- ── SERIAL ── -->
+    <section class="section" id="serial">
+      <div class="section-header">
+        <div class="section-icon section-icon-blue">🖥️</div>
+        <h2>Serial Debug Output</h2>
+      </div>
+      <p>Open Serial Monitor at <strong>115200 baud</strong>. Expected startup output:</p>
+                 <div class="callout callout-warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">Ensure the Buck Converter is <strong>NOT</strong> connected to your breakout board when using two power sources. During troubleshooting you must power the motor breakout using the <strong>9V barrel plug</strong>, and the <strong>USB-C</strong> to power the Feather RP2040. This gives you access to the Serial Monitor but also power to the motors WITHOUT the two power sources connected. You will connect the buck to the breakout when you're ready for field/production use.</div>
+      </div>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-filename">Serial Monitor — startup</span>
+        </div>
+        <pre><code>[DarthFaders] Boot
+[Motors] OK
+[Bargraph] OK
+[Switches] OK
+[Puzzle] Code: R=7 G=7 Y=7
+[Cal] Starting auto-calibration...
+[Cal] Low raw[0] = 42
+[Cal] Low raw[1] = 38
+[Cal] Low raw[2] = 45
+[Cal] High raw[0] = 4051
+[Cal] High raw[1] = 4043
+[Cal] High raw[2] = 4058
+[Cal] adcMin=88  adcMax=3993
+[Cal] Calibration complete
+[Puzzle] -> IDLE
+[Puzzle] Init complete
+[DarthFaders] Ready</code></pre>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Message</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">[Cal] Starting auto-calibration...</td><td>Boot-time slider sweep has begun</td></tr>
+            <tr><td class="mono">[Cal] Low raw[N] = N</td><td>Raw ADC reading at bottom position for each slider (0=Red, 1=Green, 2=Yellow)</td></tr>
+            <tr><td class="mono">[Cal] High raw[N] = N</td><td>Raw ADC reading at top position for each slider</td></tr>
+            <tr><td class="mono">[Cal] adcMin=N adcMax=N</td><td>Final calibrated range after margin is applied — this is what the puzzle uses</td></tr>
+            <tr><td class="mono">[Cal] WARNING: bad calibration range</td><td>Calibration produced invalid values — check motor wiring and 9V supply; fallback defaults used</td></tr>
+            <tr><td class="mono">[Puzzle] EEPROM not initialised — using defaults</td><td>First boot on fresh hardware — no saved code found, defaults (7/7/7) used</td></tr>
+            <tr><td class="mono">[Puzzle] Code: R=N G=N Y=N</td><td>Solve code loaded from EEPROM on boot</td></tr>
+            <tr><td class="mono">[Puzzle] Color N -> solve mode</td><td>A step switch was pressed; entering solve mode for that color</td></tr>
+            <tr><td class="mono">[Puzzle] Color N locked at N</td><td>Second press on a step switch; value confirmed</td></tr>
+            <tr><td class="mono">[Puzzle] -> SUCCESS</td><td>All three values match the stored code</td></tr>
+            <tr><td class="mono">[Puzzle] -> FAIL</td><td>One or more values did not match</td></tr>
+            <tr><td class="mono">[Puzzle] -> SET</td><td>Entered SET mode after 5s hold</td></tr>
+            <tr><td class="mono">[Puzzle] Code saved: R=N G=N Y=N</td><td>New solve code written to EEPROM flash</td></tr>
+            <tr><td class="mono">[Puzzle] FACTORY RESET</td><td>10s hold triggered; code reset to 7/7/7</td></tr>
+            <tr><td class="mono">[Motors] MotorShield not found!</td><td>I²C wiring issue — check SDA/SCL and power to Motor FeatherWing</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+
+<script>
+  // ── Mobile sidebar ──
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+  }
+
+  // ── Active nav link on scroll ──
+  const sections = document.querySelectorAll('.section');
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const link = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { threshold: 0.25, rootMargin: '-80px 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // ── Copy button ──
+  function copyCode(btn) {
+    const code = btn.closest('.code-block').querySelector('pre').innerText;
+    navigator.clipboard.writeText(code).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+</script>
+</body>
+</html>
